@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <title>Simple Wechat</title>
+  <link rel='stylesheet' href='./css/style.css'>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+
+<body class='home'>
+
+  <div class='area-selector'>
+    <span onclick="toggleSection(1)" class='glyphicon glyphicon-envelope'></span>
+    <span onclick="toggleSection(2)" class='glyphicon glyphicon-user'></span>
+    <span onclick="toggleSection(3)" class='glyphicon glyphicon-asterisk'></span>
+  </div>
+
+  <div class='section-container chat'>
+    <table><tr>
+    <td width='200'><div class='chat__sidebar'>
+      <h3>Contacts</h3>
+      <div id='users'></div>
+    </div></td>
+
+    <td width='1050'>
+      <div class='chat__main' style="">
+        <div id='chat-frame' class='chat-frame'>
+          <ol id='messages' class='chat__messages'></ol>
+        </div>
+
+        <div class="chat_tool">
+          <button id='send-button' onclick="send()" class='send-button'>Send</button>
+        </div>
+
+        <div class='chat__footer'>
+          <textarea type='text' id='message',placeholder='Message' required autofocus autocomplete='off'></textarea>
+        </div>
+      </div>
+    </td></tr></table>
+
+  </div>
+
+  <div class='section-container new-user'>
+    lorem ipsum
+  </div>
+
+  <div class='section-container social-media'>
+    <div class='posts-container'>
+      <div class='posts-header'>
+        <button onclick="togglePost()">New Post</button>
+        <button onclick="getPost()">Get Post</button>
+        <div class='posts-background'></div>
+        <div style="margin-top:-50px; float:right; z-index:10;position:relative">
+          <span id='name'></span>
+          <img src="../static_assets/defaultPicture.png" style="max-width:100px;" alt='my-simple-wechat' />
+        </div>
+      </div>
+
+      <div class='posts-content'>
+        <div id='posts-show' class='posts-show'></div>
+      </div>
+
+      <div class='post-tool'>
+        <div id='upload-container'>
+          <button onclick='uploadImage()'>Upload Image</button>
+          <input type="file" accept='image/*' id="post-img-0" style="display:none" alt='upload' onchange='imagePreview()'/>
+        </div>
+
+        <button id='submit-post' onclick='submitPost()'>Submit</button>
+      </div>
+
+      <div class='new-post' id='new-post'>
+        <textarea type='text' id='post-text' placeholder='Message' required autocomplete='off'></textarea>
+      </div>
+
+      <div id="preview-image-container"></div>
+    </div>
+
+  </div>
+
+  <script id='message-template' type='text/template'>
+    <li class='message'>
+      <div class='message__title'>
+        <h4>{{from}}</h4>
+        <span>{{time}}</span>
+      </div>
+      <div class='message__body'>
+        <p>{{message}}</p>
+      </div>
+    </li>
+  </script>
+
+  <script src='/socket.io/socket.io.js'></script>
+  <script src='/siofu/client.js'></script>
+  <script src='/js/libs/jquery-3.2.1.min.js'></script>
+  <script src='/js/libs/moment.js'></script>
+  <script src='/js/libs/mustache.js'></script>
+  <script src='/js/home.js'></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</body>
+
+</html>
+
+<!--
+  <script src='/js/libs/moment.js'></script>
+  <script src='/js/libs/mustache.js'></script>
+  <script src='/js/libs/deparam.js'></script>-->
+<!---->

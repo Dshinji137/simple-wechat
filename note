@@ -1,0 +1,2 @@
+cd /Users/Dshinji/mongo.3/bin
+./mongod --dbpath ~/mongo-data

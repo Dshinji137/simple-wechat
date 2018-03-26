@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+  <title>Simple Wechat</title>
+  <link rel='stylesheet' href='./css/style.css'>
+</head>
+
+<body class='centered-form'>
+  <div class='centered-form__form'>
+    <div>
+      <button onclick="toggle(1)" class='select-btn' style="background-color: #1F4C69;color:white">Sign Up</button>
+      <button onclick="toggle(2)" class='select-btn' style="background-color: white;">Log In</button>
+    </div>
+
+    <form id="sign-up" class='sign-up'>
+      <div id='1'>
+        <div class='form-field'>
+          <label>Email</label>
+          <div id="signup-error-msg" style="color:red;"></div>
+          <input id="signup-email" type="email" name="name" required autofocus/>
+        </div>
+        <div class='form-field'>
+          <label>User Name</label>
+          <input id="signup-username" type="text" name="name" required autofocus/>
+        </div>
+        <div class='form-field'>
+          <label>Password</label>
+          <input id="signup-password" type="password" required name="room"/>
+        </div>
+        <div class='form-field'>
+          <button type='submit'>Sign Up</button>
+        </div>
+      </div>
+    </form>
+
+    <form id="log-in" class='log-in'>
+      <div id='2'>
+        <div class='form-field'>
+          <div id="login-error-msg" style="color:red"></div>
+          <label>Email</label>
+          <input id="login-email" type="email" name="name" autofocus/>
+        </div>
+        <div class='form-field'>
+          <label>Password</label>
+          <input id="login-password" type="password" name="room"/>
+        </div>
+        <div class='form-field'>
+          <button type='submit'>Log in</button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <script src='/socket.io/socket.io.js'></script>
+  <script src='/js/index.js'></script>
+</body>
+
+</html>
