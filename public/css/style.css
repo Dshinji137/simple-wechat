@@ -89,6 +89,12 @@
   margin-bottom: 20px;
 }
 
+.glyphicon-bell {
+  font-size:36px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
 .glyphicon-asterisk {
   font-size:36px;
   margin-top: 20px;
@@ -297,6 +303,25 @@ button:disabled {
 
 .new-user {
   display:none;
+}
+
+.new-user input {
+  height: 50px;
+  width: 500px;
+}
+
+.new-user button {
+  height: 50px;
+  width: 50px;
+}
+
+.new-notification {
+  display: none;
+}
+
+.notification-title {
+  font-size: 28px;
+  font-weight: bold;
 }
 
 .social-media {

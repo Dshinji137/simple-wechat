@@ -8,7 +8,8 @@ const _ = require('lodash');
 const port = process.env.PORT || 4000;
 const publicPath = path.join(__dirname,'../public');
 const bodyParser = require('body-parser');
-const { ObjectID,mongodb } = require('mongodb');
+//const { ObjectID,mongodb } = require('mongodb');
+var db = require('mongodb');
 var mkdirp = require('mkdirp');
 var siofu = require("socketio-file-upload");
 var { mongoose } = require('./db/mongoose');
@@ -17,6 +18,7 @@ var { Talk } = require('./models/talk');
 var { Message } = require('./models/message');
 var { Image } = require('./models/image');
 var { Post } = require('./models/post');
+var { Contact } = require('./models/contact');
 var app = express();
 var server = http.createServer(app);
 var io = socketIO(server);
@@ -273,6 +275,78 @@ io.on('connection',(socket) => {
         ).then((talk) => {
         })
       }
+    });
+  });
+
+  socket.on('searchContact',(params,callback) => {
+    var keyword = params.keyword;
+    User.find({
+      $or: [
+        {"name":new RegExp(keyword,'gi')},
+      ]
+    }).then((users)=>{
+      var infos = [];
+      for(var i = 0; i < users.length; i++) {
+        var user = _.pick(users[i],['email','name','_id']);
+        infos.push(user);
+      }
+      callback(infos);
+    })
+  });
+
+  socket.on('add-contact',(params,callback) => {
+    Contact.findOne({
+      from: params.from,
+      to: params.to
+    }).then((contact) => {
+      var id = contact.from;
+      User.findOne({
+        _id: id
+      }).then((user) => {
+        //console.log(user);
+        socket.broadcast.to(contact.to).emit('new-contact',{_id:user._id,name:user.name,email:user.email});
+      });
+    }).catch((no) => {
+      var contact = new Contact({
+        from: params.from,
+        to: params.to,
+      });
+      contact.save().then((contact) => {
+        var id = contact.from;
+        User.findOne({
+          _id: id
+        }).then((user) => {
+          //console.log(user);
+          socket.broadcast.to(contact.to).emit('new-contact',{_id:user._id,name:user.name,email:user.email});
+        });
+      })
+    });
+  });
+
+  socket.on('new-contact-confirm',(params,callback) => {
+    var id1 = params.from;
+    var id2 = params.to;
+
+    User.findOneAndUpdate(
+      {_id: id1},
+      {
+        $push: {contacts:{messages:[],name:id2}}
+      }
+    ).then((user1) => {
+      console.log(user1);
+      User.findOneAndUpdate(
+        {_id: id2},
+        {
+          $push: {contacts:{name:id1,messages:[]}}
+        }
+      ).then((user2) => {
+        Contact.find({
+          $or: [
+            {from: id1,to: id2},
+            {to: id1,from: id2},
+          ]
+        }).remove().exec();
+      })
     });
   });
 

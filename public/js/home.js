@@ -10,6 +10,8 @@ var postOpen = false;
 var imageNum = 0;
 var input = [];
 var counter = 0;
+var newContact = [];
+var newNotifications = [];
 
 var containerWidth = window.innerWidth-150;
 var backgroundWidth = window.innerWidth-250;
@@ -71,9 +73,13 @@ function scrollToBottom2() {
 
 function toggleSection(id) {
   section = id;
-  for(var i = 1; i <= 3; i++) {
+  for(var i = 1; i <= 4; i++) {
     document.getElementsByClassName('glyphicon')[i-1].style.color = i === section? 'green':'black';
     document.getElementsByClassName('section-container')[i-1].style.display = i === section? 'block':'none';
+  }
+
+  if(id === 3) {
+    document.getElementById("notication-count").innerHTML = (newNotifications.length).toString();
   }
 }
 
@@ -295,6 +301,25 @@ socket.on('new-message',(message) => {
   }
 });
 
+socket.on("new-contact",(infos) => {
+  newNotifications.push({
+    type:'new-friend',
+    id: infos._id,
+    name: infos.name,
+  });
+
+  jQuery('#notifications').html("");
+
+  newNotifications.forEach((notification) => {
+    var template = jQuery("#new-friend-template").html();
+    var html = Mustache.render(template, {
+      username: notification.name,
+      id: notification.id.toString(),
+    });
+    jQuery('#notifications').append(html);
+  })
+})
+
 socket.on('disconnect', function() {
   //console.log('Disconnected from server');
 });
@@ -323,7 +348,41 @@ function send() {
   }
 }
 
+function addContact(index) {
+  var info = newContact[index];
+  socket.emit("add-contact",{from:userId,to:info._id});
+}
 
+function approveContact(id) {
+  socket.emit('new-contact-confirm',{from:userId,to:id});
+}
+
+function ignoreContact(ind) {
+  console.log(ind);
+}
+
+jQuery('#search-friend').on("submit",function(e) {
+  e.preventDefault();
+
+  var keyword = jQuery('[name=keyword]').val();
+  socket.emit('searchContact',{
+    keyword: keyword
+  },(list) => {
+    newContact = [];
+    jQuery("#search-results").html("");
+    list.forEach((user) => {
+      if(allContacts[user._id] === undefined) {
+        newContact.push(user);
+        var template = jQuery("#contact-template").html();
+        var html = Mustache.render(template, {
+          username: user.name,
+          id: (newContact.length-1).toString(),
+        });
+        jQuery('#search-results').append(html);
+      }
+    })
+  });
+});
 
 /*
 jQuery('#message-form').on('submit',function(e) {

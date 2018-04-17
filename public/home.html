@@ -15,7 +15,8 @@
   <div class='area-selector'>
     <span onclick="toggleSection(1)" class='glyphicon glyphicon-envelope'></span>
     <span onclick="toggleSection(2)" class='glyphicon glyphicon-user'></span>
-    <span onclick="toggleSection(3)" class='glyphicon glyphicon-asterisk'></span>
+    <span onclick="toggleSection(3)" class='glyphicon glyphicon-bell'></span>
+    <span onclick="toggleSection(4)" class='glyphicon glyphicon-asterisk'></span>
   </div>
 
   <div class='section-container chat'>
@@ -44,7 +45,18 @@
   </div>
 
   <div class='section-container new-user'>
-    lorem ipsum
+    <h3>Search New Friends</h3>
+    <form id="search-friend">
+      <input name="keyword" type="text" required>
+      <button><span type="submit" class="glyphicon glyphicon-search"></span></button>
+    </form>
+
+    <div id="search-results"></div>
+  </div>
+
+  <div class='section-container new-notification'>
+    <div class="notification-title">You have <span class="notification-title" id="notication-count"></span> messages</div>
+    <div id="notifications"></div>
   </div>
 
   <div class='section-container social-media'>
@@ -91,6 +103,27 @@
         <p>{{message}}</p>
       </div>
     </li>
+  </script>
+
+  <script id='contact-template' type='text/template'>
+    <li class='message'>
+      <div>
+        <h4>{{username}}</h4>
+        <button id={{id}} onclick="addContact({{id}})">Add</button>
+      </div>
+      <hr>
+    </li>
+  </script>
+
+  <script id='new-friend-template' type='text/template'>
+    <div class='message'>
+      <div>
+        <h4>{{username}}</h4>
+        <button id={{id}} onclick="approveContact('{{id}}')">Confirm</button>
+        <button id={{id}} onclick="ignoreContact('{{id}}')">Ignore</button>
+      </div>
+      <hr>
+    </div>
   </script>
 
   <script src='/socket.io/socket.io.js'></script>
