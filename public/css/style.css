@@ -198,6 +198,10 @@
   border: 2px solid #eae3e3;
 }
 
+.contact-list-container {
+  display: flex;
+}
+
 .message {
   padding:10px
 }

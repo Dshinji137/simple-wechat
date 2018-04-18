@@ -29,26 +29,8 @@ app.use(siofu.router);
 var files = {};
 
 io.on('connection',(socket) => {
-
-  var uploader = new siofu();
-
-  uploader.dir = path.join(__dirname,'./uploads');
-  uploader.listen(socket);
-
-  uploader.on("saved", function(event) {
-    var fileList = files[socket.id]? files[socket.id] : [];
-    fileList.push(event.file.pathName);
-    files[socket.id] = fileList;
-  });
-
-  uploader.on("error", function(event) {
-    console.log(event);
-  });
-
-  socket.on('img-complete',(params,callback) => {
-    callback();
-  });
-
+  // user signup and login
+  // ---------------------------------------------------
   socket.on('user-signup',(params,callback) => {
     var body = _.pick(params,['email','name','password']);
 
@@ -85,11 +67,16 @@ io.on('connection',(socket) => {
         callback('username and password does not match');
       }
     }, (err) => {
-      console.log(1);
+      //console.log(1);
       callback('username and password does not match');
     });
   });
+  // ---------------------------------------------------
 
+
+  // user initialize
+  // ---------------------------------------------------
+  // get chat message
   socket.on('user-init',(params,callback) => {
     var id = params.id;
     socket.join(id); // define user id
@@ -138,86 +125,40 @@ io.on('connection',(socket) => {
     })
   });
 
-  socket.on("new-post",(params,callback) => {
-    var owner = params.id;
-    var time = params.time;
-    var text = params.text;
-    var images = [];
-
-    var path = params.path;
-    var filesList = files[socket.id]? files[socket.id] : [];
-    for(var i = 0; i < filesList.length; i++) {
-      var a = new Image;
-      a.img.data = fs.readFileSync(filesList[i]);
-      a.img.contentType = 'image/png';
-      images.push(a);
-    }
-
-    var post = new Post({
-      owner: owner,
-      time: time,
-      text: text,
-      images: images,
-    });
-
-    post.save().then((post) => {
-      //console.log(post);
-    })
-  });
-
-  socket.on('get-post',(params,callback) => {
+  socket.on("get-noti",(params,callback) => {
     var id = params.id;
-    Post.find({
-      owner: id,
-    }).then((posts) => {
-      var infos = {};
-      for(var i = 0; i < posts.length; i++) {
-        var postId = posts[i]._id;
-        infos[postId] = {};
-        infos[postId]['time'] = posts[i]['time'];
-        infos[postId]['owner'] = posts[i]['owner'];
-        infos[postId]['text'] = posts[i]['text']? posts[i]['text'] :"";
-        infos[postId]['images'] = [];
-        if(posts[i]['images'].length !== 0) {
-          var tmpImages = posts[i]['images'];
-          var images = [];
-          for(var j = 0; j < tmpImages.length; j++) {
-            images.push({
-              image: true,
-              buffer: tmpImages[j]['img']['data'].toString('base64')
-            });
-          }
-          infos[postId]['images'] = images;
+    Contact.find({
+      to: id
+    }).then((msg) => {
+      if(msg.length === 0) {
+        callback(msg);
+      } else {
+        var infos = []; var cnt = 0;
+        for(var i = 0; i < msg.length; i++) {
+          User.findOne({
+            _id: msg[i].from
+          }).then((user) => {
+            var info = {
+              type: 'new-friend',
+              id: user._id,
+              name: user.name,
+            };
+            infos.push(info);
+            cnt++;
+            if(cnt === msg.length) {
+              //console.log(infos);
+              callback(infos);
+            }
+          })
         }
       }
-
-      callback(infos);
-    });
-  })
-
-  socket.on("read-message",(params,callback) => {
-    var owner = params.owner;
-    var chatter = params.chatter;
-    Talk.findOne({
-      owner:owner,
-      chatter:chatter
-    }).then((talk) => {
-      var unRead = talk.unread;
-      var id = talk._id;
-      Talk.findOneAndUpdate(
-        {_id: id},
-        {
-          $push:{read:{$each:unRead,$position:0}},
-          $set:{unread:[]}
-        }
-      ).then((talk) => {
-        console.log(talk);
-        callback();
-      })
     })
-
   });
 
+  // ---------------------------------------------------
+
+  // user chat
+  // ---------------------------------------------------
   socket.on("user-message",(params,callback) => {
     var from = params.id[0];
     var to = params.id[1];
@@ -278,6 +219,33 @@ io.on('connection',(socket) => {
     });
   });
 
+  socket.on("read-message",(params,callback) => {
+    var owner = params.owner;
+    var chatter = params.chatter;
+    Talk.findOne({
+      owner:owner,
+      chatter:chatter
+    }).then((talk) => {
+      var unRead = talk.unread;
+      var id = talk._id;
+      Talk.findOneAndUpdate(
+        {_id: id},
+        {
+          $push:{read:{$each:unRead,$position:0}},
+          $set:{unread:[]}
+        }
+      ).then((talk) => {
+        console.log(talk);
+        callback();
+      })
+    })
+  });
+
+  // ---------------------------------------------------
+
+
+  // user contact management
+  // ---------------------------------------------------
   socket.on('searchContact',(params,callback) => {
     var keyword = params.keyword;
     User.find({
@@ -304,7 +272,8 @@ io.on('connection',(socket) => {
         _id: id
       }).then((user) => {
         //console.log(user);
-        socket.broadcast.to(contact.to).emit('new-contact',{_id:user._id,name:user.name,email:user.email});
+        callback();
+        //socket.broadcast.to(contact.to).emit('new-contact',{_id:user._id,name:user.name,email:user.email});
       });
     }).catch((no) => {
       var contact = new Contact({
@@ -317,6 +286,7 @@ io.on('connection',(socket) => {
           _id: id
         }).then((user) => {
           //console.log(user);
+          callback();
           socket.broadcast.to(contact.to).emit('new-contact',{_id:user._id,name:user.name,email:user.email});
         });
       })
@@ -333,13 +303,28 @@ io.on('connection',(socket) => {
         $push: {contacts:{messages:[],name:id2}}
       }
     ).then((user1) => {
-      console.log(user1);
+      // notifiy id1 to add new friend
+      User.findOne({
+        _id:id2,
+      }).then((user) => {
+        console.log("1",user)
+        socket.emit("new-contact-added",{id:user._id,name:user.name});
+      });
+
       User.findOneAndUpdate(
         {_id: id2},
         {
           $push: {contacts:{name:id1,messages:[]}}
         }
       ).then((user2) => {
+        User.findOne({
+          _id:id1,
+        }).then((user) => {
+          console.log("2",user);
+          socket.broadcast.to(id2).emit("new-contact-added",{id:user._id,name:user.name});
+        })
+
+        // request finished, delete corresponding record
         Contact.find({
           $or: [
             {from: id1,to: id2},
@@ -349,6 +334,101 @@ io.on('connection',(socket) => {
       })
     });
   });
+
+  socket.on('new-contact-reject',(params,callback) => {
+    var id1 = params.from;
+    var id2 = params.to;
+
+    Contact.find({
+      $or: [
+        {from: id1,to: id2},
+        {to: id1,from: id2},
+      ]
+    }).remove().exec();
+
+    callback();
+  });
+  // ---------------------------------------------------
+
+  // user post
+  // ---------------------------------------------------
+  var uploader = new siofu();
+
+  uploader.dir = path.join(__dirname,'./uploads');
+  uploader.listen(socket);
+
+  uploader.on("saved", function(event) {
+    var fileList = files[socket.id]? files[socket.id] : [];
+    fileList.push(event.file.pathName);
+    files[socket.id] = fileList;
+  });
+
+  uploader.on("error", function(event) {
+    console.log(event);
+  });
+
+  socket.on('img-complete',(params,callback) => {
+    callback();
+  });
+
+  socket.on("new-post",(params,callback) => {
+    var owner = params.id;
+    var time = params.time;
+    var text = params.text;
+    var images = [];
+
+    var path = params.path;
+    var filesList = files[socket.id]? files[socket.id] : [];
+    for(var i = 0; i < filesList.length; i++) {
+      var a = new Image;
+      a.img.data = fs.readFileSync(filesList[i]);
+      a.img.contentType = 'image/png';
+      images.push(a);
+    }
+
+    var post = new Post({
+      owner: owner,
+      time: time,
+      text: text,
+      images: images,
+    });
+
+    post.save().then((post) => {
+      //console.log(post);
+    })
+  });
+
+  socket.on('get-post',(params,callback) => {
+    var id = params.id;
+    Post.find({
+      owner: id,
+    }).then((posts) => {
+      var infos = {};
+      for(var i = 0; i < posts.length; i++) {
+        var postId = posts[i]._id;
+        infos[postId] = {};
+        infos[postId]['time'] = posts[i]['time'];
+        infos[postId]['owner'] = posts[i]['owner'];
+        infos[postId]['text'] = posts[i]['text']? posts[i]['text'] :"";
+        infos[postId]['images'] = [];
+        if(posts[i]['images'].length !== 0) {
+          var tmpImages = posts[i]['images'];
+          var images = [];
+          for(var j = 0; j < tmpImages.length; j++) {
+            images.push({
+              image: true,
+              buffer: tmpImages[j]['img']['data'].toString('base64')
+            });
+          }
+          infos[postId]['images'] = images;
+        }
+      }
+
+      callback(infos);
+    });
+  });
+
+  // ---------------------------------------------------
 
   socket.on('disconnect',() => {
     //console.log('Disconnected from client');
