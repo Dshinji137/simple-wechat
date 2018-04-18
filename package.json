@@ -4,7 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node server/server.js",
     "test": "export NODE_ENV=test && mocha server/**/*.test.js"
+  },
+  "engines":{
+    "node": "8.6.0"
   },
   "author": "Dshinji",
   "license": "ISC",
