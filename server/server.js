@@ -1,3 +1,5 @@
+require('./config/config.js');
+
 const path = require('path');
 const http = require('http');
 const moment = require('moment');
@@ -5,7 +7,8 @@ const express = require('express');
 const socketIO = require('socket.io');
 const fs = require('fs');
 const _ = require('lodash');
-const port = process.env.PORT || 4000;
+//const port = process.env.PORT || 4000;
+const port = process.env.PORT;
 const publicPath = path.join(__dirname,'../public');
 const bodyParser = require('body-parser');
 //const { ObjectID,mongodb } = require('mongodb');

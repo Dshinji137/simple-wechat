@@ -1,2 +1,4 @@
 cd /Users/Dshinji/mongo.3/bin
 ./mongod --dbpath ~/mongo-data
+
+"test": "echo \"Error: no test specified\" && exit 1",
