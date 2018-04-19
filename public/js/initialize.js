@@ -22,28 +22,31 @@ socket.on('connect', function() {
           document.getElementById('count-'+user.id).style.display = "none";
 
           document.getElementById("messages").innerHTML = "";
-          var template = jQuery("#message-template").html();
+          var myMsgTemplate = jQuery("#my-message").html();
+          var otherMsgTemplate = jQuery("#other-message").html();
 
           var readMessage = read[chatId];
           if(readMessage && readMessage.length > 0) {
             for(var i = readMessage.length-1; i >= 0; i--) {
+              var template = readMessage[i].from === userId? myMsgTemplate:otherMsgTemplate;
               var html = Mustache.render(template, {
                 message: readMessage[i].content,
-                from: allContacts[readMessage[i].from],
-                time: readMessage[i].time
+                //from: allContacts[readMessage[i].from],
+                //time: readMessage[i].time
               });
               jQuery('#messages').append(html);
             }
-
           }
 
           var unreadMessage = unRead[chatId];
           if(unreadMessage && unreadMessage.length > 0) {
             for(var i = unreadMessage.length-1; i >= 0; i--) {
+              //console.log(unreadMessage[i]);
+              var template = unreadMessage[i].from === userId? myMsgTemplate:otherMsgTemplate;
               var html = Mustache.render(template, {
                 message: unreadMessage[i].content,
-                from: allContacts[unreadMessage[i].from],
-                time: unreadMessage[i].time
+                //from: allContacts[unreadMessage[i].from],
+                //time: unreadMessage[i].time
               });
               jQuery('#messages').append(html);
             }

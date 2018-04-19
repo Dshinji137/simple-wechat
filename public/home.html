@@ -8,6 +8,7 @@
   <title>Simple Wechat</title>
   <link rel='stylesheet' href='./css/style.css'>
   <link rel='stylesheet' href='./css/basic.css'>
+  <link rel='stylesheet' href='./css/chat.css'>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 </head>
 
@@ -63,8 +64,8 @@
   <div class='section-container social-media'>
     <div class='posts-container'>
       <div class='posts-header'>
-        <button onclick="togglePost()">New Post</button>
-        <button onclick="getPost()">Get Post</button>
+        <!--<button onclick="togglePost()">New Post</button>
+        <button onclick="getPost()">Get Post</button>-->
         <div class='posts-background'></div>
         <div style="margin-top:-50px; float:right; z-index:10;position:relative">
           <span id='name'></span>
@@ -72,7 +73,9 @@
         </div>
       </div>
 
-      <div class='posts-content'>
+      <h2>To Be Finished</h2>
+
+      <!--<div class='posts-content'>
         <div id='posts-show' class='posts-show'></div>
       </div>
 
@@ -89,21 +92,41 @@
         <textarea type='text' id='post-text' placeholder='Message' required autocomplete='off'></textarea>
       </div>
 
-      <div id="preview-image-container"></div>
+      <div id="preview-image-container"></div>-->
     </div>
 
   </div>
 
-  <script id='message-template' type='text/template'>
-    <li class='message'>
-      <div class='message__title'>
-        <h4>{{from}}</h4>
-        <span>{{time}}</span>
+  <script id="other-message" type="text/template">
+    <div>
+      <table><tr>
+        <td width='60'>
+          <img src="../static_assets/defaultPicture.png" style="max-width:50px;" alt='my-simple-wechat' />
+        </td>
+        <td width="200">
+          <div class="chat-box">
+            {{message}}
+          </div>
+        </td>
+      </tr></table>
+    </div>
+  </script>
+
+  <script id="my-message" type="text/template">
+    <table><tr><td width="1000" align="right">
+      <div class="my-message">
+        <table><tr>
+          <td width="200">
+            <div class="chat-box">
+              {{message}}
+            </div>
+          </td>
+          <td width='60'>
+            <img src="../static_assets/defaultPicture.png" style="max-width:50px;" alt='my-simple-wechat' />
+          </td>
+        </tr></table>
       </div>
-      <div class='message__body'>
-        <p>{{message}}</p>
-      </div>
-    </li>
+    </td></tr></table>
   </script>
 
   <script id='contact-template' type='text/template'>

@@ -27,7 +27,7 @@ function scrollToBottom2() {
 socket.on('new-message',(message) => {
   var id = message.from;
   if(chatId === id) {
-    var template = jQuery("#message-template").html();
+    var template = jQuery("#other-message").html();
     var html = Mustache.render(template, {
       message: message.content,
       from: allContacts[message.from],
@@ -72,8 +72,9 @@ function send() {
   var txarea = document.getElementById('message');
   var time = moment(moment()).format('YYYY-MM-DD HH:mm:ss');
   var message = txarea.value;
+
   if(message.trim().length > 0) {
-    var template = jQuery("#message-template").html();
+    var template = jQuery("#my-message").html();
     var html = Mustache.render(template, {
       message: message,
       from: allContacts[userId],

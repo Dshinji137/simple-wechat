@@ -167,10 +167,11 @@
 }
 
 .send-button {
-  width: 50px;
+  width: 100px;
   height: 30px;
   float: right;
   color: white;
+  background-color: lightgreen;
 }
 
 .chat__footer {
@@ -309,14 +310,24 @@ button:disabled {
   display:none;
 }
 
+.new-user h3 {
+  float: left;
+}
+
 .new-user input {
   height: 50px;
   width: 500px;
+  font-size:20px;
+}
+
+.new-user input:focus {
+  outline: none;
 }
 
 .new-user button {
   height: 50px;
   width: 50px;
+  font-size:20px;
 }
 
 .new-notification {

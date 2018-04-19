@@ -1,0 +1,15 @@
+.chat-box {
+  width:90%;
+  background-color:#87cefa;
+  color: white;
+  border-radius:5px;
+  font-size:20px;
+  height: auto;
+  padding: 10px;
+  margin-top:10px;
+  margin-bottom:10px;
+}
+
+.my-message {
+  display: block;
+}
